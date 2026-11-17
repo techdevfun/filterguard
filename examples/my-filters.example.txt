@@ -1,0 +1,8 @@
+! SYNTHETIC example - not a real filter list. Paste your own
+! My filters export here (uBlock Origin Dashboard -> My filters -> Export).
+||ads.example.com^
+example.com##.ad-banner
+@@||example.com^$document
+! The next line is what a planted filter looks like. If you see a
+! trusted-* rule in your own list that you did not write, delete it.
+! example.com#%#//scriptlet('trusted-rpnt', 'test', 'test')

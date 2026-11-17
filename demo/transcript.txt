@@ -1,0 +1,134 @@
+# filterguard demo - real CLI output on SYNTHETIC fixtures
+# (fixture profile + filter list built in this script; the
+#  planted rule shape is from the public GHSA-cmqw-9r2w-6wv2
+#  write-ups, on a fixture domain - not a real victim)
+
+$ filterguard scan --profile-dir fixture-profile
+target                                                     severity reason
+----------------------------------------------------------------------------------------------------------
+Quick Notes Everywhere 2.3.0 (bbbbbbbbbbbbbbbbbbbbbbbbbbbb HIGH     can read and change data on every site you visit
+  evidence: host access: <all_urls>
+  fix: If you do not need this extension on every site, restrict its site access in the browser settings.
+Quick Notes Everywhere 2.3.0 (bbbbbbbbbbbbbbbbbbbbbbbbbbbb MEDIUM   content script runs on every page before it loads
+  evidence: content script matches <all_urls> at document_start
+  fix: Check the extension source or reviews for why it needs to run before page load.
+uBlock Origin 1.75.2 (cjpalhdlnbpafiamejdnhcphjbkeiagm)    HIGH     can read and change data on every site you visit
+  evidence: host access: <all_urls>
+  fix: If you do not need this extension on every site, restrict its site access in the browser settings.
+uBlock Origin 1.75.2 (cjpalhdlnbpafiamejdnhcphjbkeiagm)    MEDIUM   webRequestBlocking can block and rewrite network traffic
+  evidence: permission: webRequestBlocking
+  fix: Remove the extension if you do not need a capability this strong.
+uBlock Origin 1.75.2 (cjpalhdlnbpafiamejdnhcphjbkeiagm)    LOW      Manifest V2 extension on a Chromium browser (Google is phasing MV2 out)
+  evidence: manifest_version: 2
+  fix: Look for a Manifest V3 version of this extension.
+uBlock Origin 1.75.2 (cjpalhdlnbpafiamejdnhcphjbkeiagm)    HIGH     uBlock Origin 1.75.2 is VULNERABLE to GHSA-cmqw-9r2w-6wv2
+  evidence: uBlock Origin 1.75.2; vulnerable <= 1.75.2, fixed 1.75.4, recommended 1.76.4+ (GHSA-cmqw-9r2w-6wv2)
+  fix: Versions 1.75.2 and lower are vulnerable. Update to 1.76.4 or newer, then run `filterguard filters` - the update does NOT remove a filter the attack already planted.
+
+summary: HIGH 3 | MEDIUM 2 | LOW 1 | profiles 1 | extensions 2 | rules parsed 0
+Scope: filterguard audits extension manifests and filter lists only. It does not inspect extension code, runtime behaviour, or store-freshness. A clean result means no risky manifest or filter was found - not that the browser is safe. It never deletes anything: review each finding, then remove the rule or extension yourself.
+exit: 1
+
+$ filterguard filters --filters my-filters.txt
+target                                                     severity reason
+----------------------------------------------------------------------------------------------------------
+line 5: example.com#%#//scriptlet('trusted-rpnt', 'test',  HIGH     trusted scriptlet trusted-rpnt runs JavaScript on example.com; planted-filter vector: GHSA-cmqw-9r2w-6wv2 (uBlock Origin universal XSS, High, public 15 Nov 2026)
+  evidence: line 5, sha256 29346360a4e3
+  fix: Open uBlock Origin Dashboard -> My filters, find line 5, and delete this rule if you did not write it. Then re-run `filterguard check`. If you DID write it on purpose, allowlist it with `filterguard filters --save-baseline` after review - never allowlist a rule you do not recognise.
+line 6: example.org##+js(trusted-set, localStorage, myFlag HIGH     trusted scriptlet trusted-set runs JavaScript on example.org; planted-filter vector: GHSA-cmqw-9r2w-6wv2 (uBlock Origin universal XSS, High, public 15 Nov 2026)
+  evidence: line 6, sha256 e02d09e37653
+  fix: Open uBlock Origin Dashboard -> My filters, find line 6, and delete this rule if you did not write it. Then re-run `filterguard check`. If you DID write it on purpose, allowlist it with `filterguard filters --save-baseline` after review - never allowlist a rule you do not recognise.
+
+summary: HIGH 2 | MEDIUM 0 | LOW 0 | profiles 0 | extensions 0 | rules parsed 5
+Scope: filterguard audits extension manifests and filter lists only. It does not inspect extension code, runtime behaviour, or store-freshness. A clean result means no risky manifest or filter was found - not that the browser is safe. It never deletes anything: review each finding, then remove the rule or extension yourself.
+exit: 1
+
+$ filterguard check --profile-dir fixture-profile --filters my-filters.txt
+target                                                     severity reason
+----------------------------------------------------------------------------------------------------------
+Quick Notes Everywhere 2.3.0 (bbbbbbbbbbbbbbbbbbbbbbbbbbbb HIGH     can read and change data on every site you visit
+  evidence: host access: <all_urls>
+  fix: If you do not need this extension on every site, restrict its site access in the browser settings.
+Quick Notes Everywhere 2.3.0 (bbbbbbbbbbbbbbbbbbbbbbbbbbbb MEDIUM   content script runs on every page before it loads
+  evidence: content script matches <all_urls> at document_start
+  fix: Check the extension source or reviews for why it needs to run before page load.
+uBlock Origin 1.75.2 (cjpalhdlnbpafiamejdnhcphjbkeiagm)    HIGH     can read and change data on every site you visit
+  evidence: host access: <all_urls>
+  fix: If you do not need this extension on every site, restrict its site access in the browser settings.
+uBlock Origin 1.75.2 (cjpalhdlnbpafiamejdnhcphjbkeiagm)    MEDIUM   webRequestBlocking can block and rewrite network traffic
+  evidence: permission: webRequestBlocking
+  fix: Remove the extension if you do not need a capability this strong.
+uBlock Origin 1.75.2 (cjpalhdlnbpafiamejdnhcphjbkeiagm)    LOW      Manifest V2 extension on a Chromium browser (Google is phasing MV2 out)
+  evidence: manifest_version: 2
+  fix: Look for a Manifest V3 version of this extension.
+uBlock Origin 1.75.2 (cjpalhdlnbpafiamejdnhcphjbkeiagm)    HIGH     uBlock Origin 1.75.2 is VULNERABLE to GHSA-cmqw-9r2w-6wv2
+  evidence: uBlock Origin 1.75.2; vulnerable <= 1.75.2, fixed 1.75.4, recommended 1.76.4+ (GHSA-cmqw-9r2w-6wv2)
+  fix: Versions 1.75.2 and lower are vulnerable. Update to 1.76.4 or newer, then run `filterguard filters` - the update does NOT remove a filter the attack already planted.
+line 5: example.com#%#//scriptlet('trusted-rpnt', 'test',  HIGH     trusted scriptlet trusted-rpnt runs JavaScript on example.com; planted-filter vector: GHSA-cmqw-9r2w-6wv2 (uBlock Origin universal XSS, High, public 15 Nov 2026)
+  evidence: line 5, sha256 29346360a4e3
+  fix: Open uBlock Origin Dashboard -> My filters, find line 5, and delete this rule if you did not write it. Then re-run `filterguard check`. If you DID write it on purpose, allowlist it with `filterguard filters --save-baseline` after review - never allowlist a rule you do not recognise.
+line 6: example.org##+js(trusted-set, localStorage, myFlag HIGH     trusted scriptlet trusted-set runs JavaScript on example.org; planted-filter vector: GHSA-cmqw-9r2w-6wv2 (uBlock Origin universal XSS, High, public 15 Nov 2026)
+  evidence: line 6, sha256 e02d09e37653
+  fix: Open uBlock Origin Dashboard -> My filters, find line 6, and delete this rule if you did not write it. Then re-run `filterguard check`. If you DID write it on purpose, allowlist it with `filterguard filters --save-baseline` after review - never allowlist a rule you do not recognise.
+
+summary: HIGH 5 | MEDIUM 2 | LOW 1 | profiles 1 | extensions 2 | rules parsed 5
+Scope: filterguard audits extension manifests and filter lists only. It does not inspect extension code, runtime behaviour, or store-freshness. A clean result means no risky manifest or filter was found - not that the browser is safe. It never deletes anything: review each finding, then remove the rule or extension yourself.
+exit: 1
+
+$ filterguard explain "example.com#%#//scriptlet('trusted-rpnt', 'test', 'test')"
+rule: example.com#%#//scriptlet('trusted-rpnt', 'test', 'test')
+kind: scriptlet
+domains: example.com
+options: -
+trusted scriptlet: trusted-rpnt
+severity: HIGH
+sha256: 29346360a4e39399aeb993945174ac5e86da27b0339bc1d1ef200b86316fb1ca
+reasons:
+  - trusted scriptlet trusted-rpnt runs JavaScript on example.com
+  - planted-filter vector: GHSA-cmqw-9r2w-6wv2 (uBlock Origin universal XSS, High, public 15 Nov 2026)
+what to do: Open uBlock Origin Dashboard -> My filters, find this rule, and delete this rule if you did not write it. Then re-run `filterguard check`. If you DID write it on purpose, allowlist it with `filterguard filters --save-baseline` after review - never allowlist a rule you do not recognise.
+reference: GHSA-cmqw-9r2w-6wv2 - https://github.com/gorhill/uBlock/security/advisories/GHSA-cmqw-9r2w-6wv2
+Scope: filterguard audits extension manifests and filter lists only. It does not inspect extension code, runtime behaviour, or store-freshness. A clean result means no risky manifest or filter was found - not that the browser is safe. It never deletes anything: review each finding, then remove the rule or extension yourself.
+exit: 1
+
+# Fix: update uBlock Origin to 1.76.4, delete the planted rule,
+# keep the trusted rule you wrote, baseline the reviewed state
+$ filterguard scan --profile-dir fixture-profile --save-baseline baseline.json
+baseline saved: /tmp/filterguard-demo/baseline.json (4 finding(s))
+target                                                     severity reason
+----------------------------------------------------------------------------------------------------------
+Quick Notes Everywhere 2.3.0 (bbbbbbbbbbbbbbbbbbbbbbbbbbbb HIGH     can read and change data on every site you visit
+  evidence: host access: <all_urls>
+  fix: If you do not need this extension on every site, restrict its site access in the browser settings.
+Quick Notes Everywhere 2.3.0 (bbbbbbbbbbbbbbbbbbbbbbbbbbbb MEDIUM   content script runs on every page before it loads
+  evidence: content script matches <all_urls> at document_start
+  fix: Check the extension source or reviews for why it needs to run before page load.
+uBlock Origin 1.76.4 (cjpalhdlnbpafiamejdnhcphjbkeiagm)    HIGH     can read and change data on every site you visit
+  evidence: host access: <all_urls>
+  fix: If you do not need this extension on every site, restrict its site access in the browser settings.
+uBlock Origin 1.76.4 (cjpalhdlnbpafiamejdnhcphjbkeiagm)    LOW      Manifest V2 extension on a Chromium browser (Google is phasing MV2 out)
+  evidence: manifest_version: 2
+  fix: Look for a Manifest V3 version of this extension.
+
+summary: HIGH 2 | MEDIUM 1 | LOW 1 | profiles 1 | extensions 2 | rules parsed 0
+Scope: filterguard audits extension manifests and filter lists only. It does not inspect extension code, runtime behaviour, or store-freshness. A clean result means no risky manifest or filter was found - not that the browser is safe. It never deletes anything: review each finding, then remove the rule or extension yourself.
+exit: 1
+$ filterguard filters --filters my-filters.txt --save-baseline baseline.json
+baseline saved: /tmp/filterguard-demo/baseline.json (1 finding(s))
+target                                                     severity reason
+----------------------------------------------------------------------------------------------------------
+line 5: example.org##+js(trusted-set, localStorage, myFlag HIGH     trusted scriptlet trusted-set runs JavaScript on example.org; planted-filter vector: GHSA-cmqw-9r2w-6wv2 (uBlock Origin universal XSS, High, public 15 Nov 2026)
+  evidence: line 5, sha256 e02d09e37653
+  fix: Open uBlock Origin Dashboard -> My filters, find line 5, and delete this rule if you did not write it. Then re-run `filterguard check`. If you DID write it on purpose, allowlist it with `filterguard filters --save-baseline` after review - never allowlist a rule you do not recognise.
+
+summary: HIGH 1 | MEDIUM 0 | LOW 0 | profiles 0 | extensions 0 | rules parsed 4
+Scope: filterguard audits extension manifests and filter lists only. It does not inspect extension code, runtime behaviour, or store-freshness. A clean result means no risky manifest or filter was found - not that the browser is safe. It never deletes anything: review each finding, then remove the rule or extension yourself.
+exit: 1
+
+$ filterguard check --profile-dir fixture-profile --filters my-filters.txt --baseline baseline.json
+no findings
+
+summary: HIGH 0 | MEDIUM 0 | LOW 0 | profiles 1 | extensions 2 | rules parsed 4
+Scope: filterguard audits extension manifests and filter lists only. It does not inspect extension code, runtime behaviour, or store-freshness. A clean result means no risky manifest or filter was found - not that the browser is safe. It never deletes anything: review each finding, then remove the rule or extension yourself.
+
+accepted by baseline: 5 finding(s) (reviewed, not failed)

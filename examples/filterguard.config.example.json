@@ -1,0 +1,1 @@
+{"baselineFile":"filterguard.baseline.json","browsers":["chrome","chromium","brave","edge","firefox"],"filtersFile":null,"profileDir":null,"thresholds":{"high":40,"medium":20},"version":1}
